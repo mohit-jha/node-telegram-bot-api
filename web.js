@@ -37,13 +37,11 @@ bot.onText(/\/phone (.+)/, (msg, match) => {
 
                     var matrix = [];
 
-                    var i;
-                    for (i = 0; i <= b.length; i++) {
+                    for (let i = 0; i <= b.length; i++) {
                         matrix[i] = [i];
                     }
 
-                    var j;
-                    for (j = 0; j <= a.length; j++) {
+                    for (let j = 0; j <= a.length; j++) {
                         matrix[0][j] = j;
                     }
 
