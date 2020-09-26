@@ -1,4 +1,3 @@
-
 const express = require("express")();
 const request = require('request');
 const TelegramBot = require('node-telegram-bot-api');
@@ -18,61 +17,60 @@ bot.onText(/\/phone (.+)/, (msg, match) => {
     axios.get(`https://script.google.com/macros/s/AKfycbzY-rUfCCexcS8qc_X8a0tTr59hkD1OkAgUaI1MKG31tjWKzCcE/exec`)
         .then((res) => {
             var data = res.data
-            var check = names.includes(resp);
             data.forEach(element => {
                 names.push(element.name)
                 phones.push(element.phone)
             });
-            if (names.includes(resp)) {
-                console.log("sucess");
-                var similar_index = names.indexOf(resp);
-                bot.sendMessage(chatId, phones[similar_index]);
-            }
 
-            else {
+            getEditDistance = function (a, b) {
+                if (a.length == 0) return b.length;
+                if (b.length == 0) return a.length;
 
-                getEditDistance = function (a, b) {
-                    if (a.length == 0) return b.length;
-                    if (b.length == 0) return a.length;
+                var matrix = [];
 
-                    var matrix = [];
+                for (let i = 0; i <= b.length; i++) {
+                    matrix[i] = [i];
+                }
 
-                    for (let i = 0; i <= b.length; i++) {
-                        matrix[i] = [i];
-                    }
+                for (let j = 0; j <= a.length; j++) {
+                    matrix[0][j] = j;
+                }
 
-                    for (let j = 0; j <= a.length; j++) {
-                        matrix[0][j] = j;
-                    }
+                for (i = 1; i <= b.length; i++) {
+                    for (j = 1; j <= a.length; j++) {
+                        if (b.charAt(i - 1) == a.charAt(j - 1)) {
+                            matrix[i][j] = matrix[i - 1][j - 1];
+                        }
 
-                    // console.log(matrix);
-                    for (i = 1; i <= b.length; i++) {
-                        for (j = 1; j <= a.length; j++) {
-                            if (b.charAt(i - 1) == a.charAt(j - 1)) {
-                                matrix[i][j] = matrix[i - 1][j - 1];
-                                // console.log(matrix[i - 1][j - 1]);
-                            }
-
-                            else {
-                                matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1,
-                                    Math.min(matrix[i][j - 1] + 1,
-                                        matrix[i - 1][j] + 1));
-                            }
+                        else {
+                            matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1,
+                                Math.min(matrix[i][j - 1] + 1,
+                                    matrix[i - 1][j] + 1));
                         }
                     }
-                    return matrix[b.length][a.length];
-                };
+                }
+                console.log(names);
+                return matrix[b.length][a.length];
+            };
 
-                const output = []
-                const names = ["mohit", "himanshu", "vishal", "kaushal", "siddhartha", "abhishek", "z"]
-                names.forEach(element => {
-                    output.push(getEditDistance("mohi", element));
-                });
-                const min = Math.min.apply(null, output)
-                const indexOfName = (output.indexOf(min));
-                bot.sendMessage(chatId, ` did you mean ${names[indexOfName]}`);
+            const output = []
+            names.forEach(element => {
+                output.push(getEditDistance(resp, element));
+
+            });
+            const min = Math.min.apply(null, output)
+            console.log(min, "min");
+            const indexOfName = (output.indexOf(min));
+            console.log(indexOfName);
+            if (min == 0) {
+                bot.sendMessage(chatId, phones[indexOfName]);
 
             }
+            else {
+
+                bot.sendMessage(chatId, ` did you mean ${names[indexOfName]}`);
+            }
+
         }).catch((err) => { console.log(err) });
 
 });
