@@ -49,7 +49,6 @@ bot.onText(/\/phone (.+)/, (msg, match) => {
                         }
                     }
                 }
-                console.log(names);
                 return matrix[b.length][a.length];
             };
 
@@ -59,9 +58,7 @@ bot.onText(/\/phone (.+)/, (msg, match) => {
 
             });
             const min = Math.min.apply(null, output)
-            console.log(min, "min");
             const indexOfName = (output.indexOf(min));
-            console.log(indexOfName);
             if (min == 0) {
                 bot.sendMessage(chatId, phones[indexOfName]);
 
